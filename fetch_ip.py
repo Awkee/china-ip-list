@@ -102,16 +102,20 @@ def start_get_ip():
     city_info = get_city_info()
 
     # 2.按城市采集IP段数据
+    clen = len(city_info)
+    cur = 0
     for city in city_info:
         try:
+            print(f"[{cur}/{clen}]正在采集 {city['name']} 地区数据...")
             result = get_city_ip(city['url'])
+            cur += 1
             # 保存到文件
             with open( out_dir + city['file'], "w") as f:
                 f.write(result)
-            print("采集", city['name'], "地区数据结束.")
             time.sleep(1)
         except Exception as e:
             print("采集IP段时发生异常:", str(e))
+    print(f"共采集 {cur}/{clen} 个地区 IP段数据!")
 
 
 if __name__ == "__main__":
