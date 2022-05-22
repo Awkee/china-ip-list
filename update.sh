@@ -20,7 +20,11 @@ iplist="ip.list"
 # 更新ip目录下到IP段文件
 fetch() {
 
-    [[ `which python3` ]] || ( echo "没找到python3环境，安装Python3.9" && sudo apt install -y python3 python3-pip)
+    py_path="`which python3`"
+    if [ "$py_path" = "" ]  ; then 
+        echo "没找到python3环境，安装Python3.9"
+        sudo apt install -y python3 python3-pip
+    fi
 
     echo "安装Python3 依赖包:" && sudo python3 -m pip install -r ./requirements.txt
 
@@ -30,7 +34,7 @@ fetch() {
 update() {
     echo "开始生成 ip.list 列表文件"
     echo > $iplist
-    for fn in `ls ip/*.txt`
+    for fn in `ls ./ip/*.txt`
     do
         # echo "$url_base/$fn" >> $iplist
         echo "$fn" >> $iplist

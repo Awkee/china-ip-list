@@ -27,6 +27,7 @@ def get_resp(url, proxies=None, headers=None, timeout=10, verify=True, allow_red
     resp = None
     for _ in range(3):
         try:
+            print("开始访问:", url)
             resp = requests.get(url, proxies=proxies, headers=headers, timeout=timeout, verify=verify, allow_redirects=allow_redirects)
             return resp
         except Exception as e:
@@ -66,6 +67,7 @@ def get_city_ip(city_ip_url):
             result = line
         else:
             result += line
+    print("获取城市IP段信息:", len(result.split('\n')))
     return result
 
 def get_city_info():
@@ -93,6 +95,7 @@ def get_city_info():
             "url": url_home + code_list[i],
             "file": file_name
         })
+    print("获取城市信息数量:", len(city_info))
     return city_info
 
 
