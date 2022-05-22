@@ -35,7 +35,7 @@ def get_resp(url, proxies=None, headers=None, timeout=10, verify=True, allow_red
     return None
 
 
-def get_city_ip(city_ip_url):
+def get_city_ip(city):
     """
     功能: 采集指定城市IP段数据
     返回:
@@ -45,7 +45,12 @@ def get_city_ip(city_ip_url):
     # 限制常用的国内ISP运营商#
     isp_mask = ["联通", "电信", "移动", "铁通", "科技网", "广电", "教育网", "方正宽带"]
 
+    city_ip_url = city["url"]
     resp1 = get_resp(city_ip_url)
+    if resp1 is None:
+        return False
+    if resp1.status_code != 200:
+        return False
     doc = etree.HTML(resp1.content)
     # 提取IP段信息及ISP运营商信息
     ip_list = doc.xpath('//table/tbody/tr/td[1]/a/text()')
@@ -67,8 +72,11 @@ def get_city_ip(city_ip_url):
             result = line
         else:
             result += line
-    print("获取城市IP段信息:", len(result.split('\n')))
-    return result
+    out_path = "./ip/" + city["file"]
+    with open( out_path, "w") as f:
+        f.write(result)
+    print("采集", city['name'] , "地区数据完成! 获取城市IP段信息: [", len(result.split('\n')), "].")
+    return True
 
 def get_city_info():
     """
@@ -100,25 +108,22 @@ def get_city_info():
 
 
 def start_get_ip():
-    out_dir = "./ip/"
+    
     # 1.获取全国各地区IP段URL地址
     city_info = get_city_info()
 
     # 2.按城市采集IP段数据
-    clen = len(city_info)
-    cur = 0
-    for city in city_info:
-        try:
-            print(f"[{cur}/{clen}]正在采集 {city['name']} 地区数据...")
-            result = get_city_ip(city['url'])
-            cur += 1
-            # 保存到文件
-            with open( out_dir + city['file'], "w") as f:
-                f.write(result)
-            time.sleep(1)
-        except Exception as e:
-            print("采集IP段时发生异常:", str(e))
-    print(f"共采集 {cur}/{clen} 个地区 IP段数据!")
+    # clen = len(city_info)
+    # cur = 0
+    from multiprocessing import Pool
+
+    with Pool(5) as pool:
+        result = pool.map(get_city_ip, city_info[:])
+        for i in range(0, len(result)):
+            if result[i] is False:
+                print("采集失败地区:[", city_info[i]["name"], "]")
+            # else:
+            #     print("采集成功地区:", city_info[i]["name"])
 
 
 if __name__ == "__main__":
