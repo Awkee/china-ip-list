@@ -14,7 +14,7 @@ source $HOME/.bashrc
 wkdir=`dirname $0`
 cd $wkdir
 
-url_base="https://raw.githubusercontent.com/learnhard-cn/china-ip-list/main"
+url_base="https://raw.githubusercontent.com/Awkee/china-ip-list/main"
 iplist="ip.list"
 
 # 更新ip目录下到IP段文件
